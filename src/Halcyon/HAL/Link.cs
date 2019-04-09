@@ -13,14 +13,13 @@ namespace Halcyon.HAL {
 
         private readonly bool replaceParameters;
 
-        public Link(string rel, string href, string title = null, string method = null, bool replaceParameters = true, bool isRelArray = false, object templateVariables = null) {
+        public Link(string rel, string href, string title = null, string method = null, bool replaceParameters = true, bool isRelArray = false) {
             this.Rel = rel;
             this.Href = href;
             this.Title = title;
             this.Method = method;
             this.replaceParameters = replaceParameters;
             this.IsRelArray = isRelArray;
-            this.TemplateVariables = templateVariables;
         }
 
         [JsonIgnore]
@@ -30,7 +29,7 @@ namespace Halcyon.HAL {
         public bool IsRelArray { get; private set; }
 
         [JsonIgnore]
-        public object TemplateVariables { get; private set; }
+        public object Parameters { get; set; }
 
         [JsonProperty("href")]
         public string Href { get; private set; }
@@ -66,7 +65,7 @@ namespace Halcyon.HAL {
         internal Link CreateLink(IDictionary<string, object> modelParameters) {
             var clone = Clone();
 
-            var linkParameters = TemplateVariables?.ToDictionary();
+            var linkParameters = Parameters?.ToDictionary();
             IDictionary<string, object> parameters;
             if (linkParameters == null) {
                 parameters = modelParameters;
