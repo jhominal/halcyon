@@ -73,9 +73,6 @@ namespace Halcyon.HAL {
                 parameters = linkParameters;
             } else {
                 parameters = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-            }
-
-            if (linkParameters != null && parameters != null) {
                 foreach (var parameter in modelParameters) {
                     parameters[parameter.Key] = parameter.Value;
                 }
