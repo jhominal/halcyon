@@ -13,13 +13,14 @@ namespace Halcyon.HAL {
 
         private readonly bool replaceParameters;
 
-        public Link(string rel, string href, string title = null, string method = null, bool replaceParameters = true, bool isRelArray = false) {
+        public Link(string rel, string href, string title = null, string method = null, bool replaceParameters = true, bool isRelArray = false, object templateVariables = null) {
             this.Rel = rel;
             this.Href = href;
             this.Title = title;
             this.Method = method;
             this.replaceParameters = replaceParameters;
             this.IsRelArray = isRelArray;
+            this.TemplateVariables = templateVariables;
         }
 
         [JsonIgnore]
@@ -27,6 +28,9 @@ namespace Halcyon.HAL {
 
         [JsonIgnore]
         public bool IsRelArray { get; private set; }
+
+        [JsonIgnore]
+        public object TemplateVariables { get; private set; }
 
         [JsonProperty("href")]
         public string Href { get; private set; }
@@ -59,8 +63,27 @@ namespace Halcyon.HAL {
         [JsonProperty("hreflang", NullValueHandling = NullValueHandling.Ignore)]
         public string HrefLang { get; set; }
 
-        internal Link CreateLink(IDictionary<string, object> parameters) {
+        internal Link CreateLink(IDictionary<string, object> modelParameters) {
             var clone = Clone();
+
+            var linkParameters = TemplateVariables?.ToDictionary();
+            IDictionary<string, object> parameters;
+            if (linkParameters == null) {
+                parameters = modelParameters;
+            } else if (modelParameters == null) {
+                parameters = linkParameters;
+            } else {
+                parameters = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+            }
+
+            if (linkParameters != null && parameters != null) {
+                foreach (var parameter in modelParameters) {
+                    parameters[parameter.Key] = parameter.Value;
+                }
+                foreach (var parameter in linkParameters) {
+                    parameters[parameter.Key] = parameter.Value;
+                }
+            }
 
             if(replaceParameters && parameters != null) {
                 if(!String.IsNullOrWhiteSpace(clone.Href)) {
