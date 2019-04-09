@@ -15,8 +15,17 @@ namespace Halcyon.Templates {
                 var name = parameter.Key;
                 var value = parameter.Value;
 
-                var substituionValue = value == null ? null : value.ToString();
-                uriTemplate.SetParameter(name, substituionValue);
+                var valueAsDict = value as IDictionary<string, string>;
+                var valueAsList = value as IEnumerable<string>;
+
+                if (valueAsDict != null) {
+                    uriTemplate.SetParameter(name, valueAsDict);
+                } else if (valueAsList != null) {
+                    uriTemplate.SetParameter(name, valueAsList);
+                } else {
+                    var substitutionValue = value == null ? null : value.ToString();
+                    uriTemplate.SetParameter(name, substitutionValue);
+                }
             }
 
             return uriTemplate.Resolve();
